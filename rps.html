@@ -1,0 +1,804 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rock Paper Scissors Battle!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+      :root {
+        --sky-blue: #6495ED;
+        --light-blue: #87CEFA;
+        --ground-brown: #8B4513;
+        --grass-green: #228B22;
+        --box-beige: #FFE4B5;
+        --text-color: #FFFFFF;
+        --success-color: #4CAF50;
+        --warning-color: #FFC107;
+        --accent-color: #F44336;
+        
+        font-family: 'Press Start 2P', system-ui, sans-serif;
+        line-height: 1.5;
+        font-weight: 400;
+
+        color: var(--text-color);
+        background-color: var(--sky-blue);
+
+        font-synthesis: none;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: none;
+        -moz-osx-font-smoothing: none;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        image-rendering: pixelated;
+      }
+
+      body {
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-width: 320px;
+        min-height: 100vh;
+        background-color: var(--sky-blue);
+      }
+
+      #game-container {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        max-width: 800px;
+        height: 600px;
+        position: relative;
+        image-rendering: pixelated;
+      }
+
+      #game-header {
+        padding: 16px;
+        text-align: center;
+        text-shadow: 2px 2px #000000;
+      }
+
+      #game-header h1 {
+        font-size: 2rem;
+        margin-bottom: 8px;
+        letter-spacing: 2px;
+      }
+
+      #score-container {
+        display: flex;
+        justify-content: space-around;
+        font-size: 1rem;
+        text-shadow: 2px 2px #000000;
+      }
+
+      #game-arena {
+        flex: 1;
+        position: relative;
+        background-color: var(--light-blue);
+        border: 4px solid #000000;
+        overflow: hidden;
+      }
+
+      #ground {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        height: 80px;
+        background-color: var(--ground-brown);
+        border-top: 14px solid var(--grass-green);
+      }
+
+      #player {
+        position: absolute;
+        width: 32px;
+        height: 32px;
+        background-color: #e7574d;
+        bottom: 80px;
+        left: 50%;
+        transform: translateX(-50%);
+        transition: left 0.05s linear;
+        margin: 0;
+        image-rendering: pixelated;
+      }
+      #player::after {
+  content: '';
+  position: absolute;
+  width: 6px;
+  height: 7px;
+  background: black;
+  top: 8px;
+  left: 9px;
+  outline: white 2px solid;
+  outline-offset: -1px;
+}
+
+#player::before {
+  content: '';
+  position: absolute;
+  width: 6px;
+  height: 7px;
+  background: black;
+  top: 8px;
+  left: 19px; /* shifted right from 9px to 17px */
+  outline: white 2px solid;
+  outline-offset: -1px;
+}
+
+      
+
+      #options-container {
+        display: flex;
+        justify-content: space-around;
+        position: absolute;
+        bottom: 150px;
+        width: 100%;
+        padding: 0 50px;
+      }
+
+      .option {
+        width: 100px;
+        height: 100px;
+        background-color: var(--box-beige);
+        border: 4px solid #000000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: 'Press Start 2P';
+        font-size: 1rem;
+        color: #000000;
+        text-transform: uppercase;
+        image-rendering: pixelated;
+        transition: transform 0.2s, box-shadow 0.2s;
+        position: relative;
+        overflow: visible;
+      }
+
+      .option-emoji {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        font-size: 3.5rem;
+        opacity: 0;
+        pointer-events: none;
+        transform: translate(-50%, -100%);
+        z-index: 0;
+        transition: opacity 0.1s, transform 0.1s;
+      }
+
+      #instructions {
+        position: absolute;
+        bottom: 20px;
+        width: 100%;
+        text-align: center;
+        font-size: 1rem;
+        color: var(--text-color);
+        text-shadow: 2px 2px #000000;
+      }
+
+      #battle-screen {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: var(--light-blue);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s linear;
+        border: 4px solid #000000;
+      }
+#mouth {
+  position: absolute;
+  width: 10px;
+  height: 3px;
+  background: #000000;
+  border-radius: 2px;
+  bottom: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+      #battle-container {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        width: 100%;
+        margin-bottom: 40px;
+      }
+
+      #player-choice, #computer-choice {
+        width: 120px;
+        height: 120px;
+        background-color: var (--box-beige);
+        border: 4px solid #000000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 3rem;
+      }
+
+      #vs {
+        font-size: 2rem;
+        color: var(--text-color);
+        text-shadow: 2px 2px #000000;
+      }
+
+      #battle-message {
+        font-size: 1.5rem;
+        color: var(--text-color);
+        text-shadow: 2px 2px #000000;
+        margin-bottom: 20px;
+        text-align: center;
+        min-height: 1.5em;
+      }
+
+      #battle-continue {
+        font-size: 1rem;
+        color: var(--text-color);
+        text-shadow: 2px 2px #000000;
+        margin-top: 20px;
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
+
+      @keyframes jump {
+        0% { bottom: 84px; }
+        50% { bottom: 120px; }
+        100% { bottom: 84px; }
+      }
+
+      @keyframes flash {
+        0% { filter: brightness(100%); }
+        50% { filter: brightness(200%); }
+        100% { filter: brightness(100%); }
+      }
+
+      @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); }
+      }
+
+      @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-4px); }
+        75% { transform: translateX(4px); }
+      }
+
+      @keyframes bounce {
+  0%   { transform: translateY(0); }
+  20%  { transform: translateY(-30px); }
+  40%  { transform: translateY(-40px); }
+  60%  { transform: translateY(-30px); }
+  80%  { transform: translateY(-10px); }
+  100% { transform: translateY(0); }
+}
+
+@keyframes popout {
+  0% {
+    opacity: 0.25;
+    transform: translate(-50%, -50%);
+  }
+  40% {
+    opacity: 1;
+    transform: translate(-50%, -140px); /* Fast rise */
+  }
+  75% {
+    opacity: 1;
+    transform: translate(-50%, -140px); /* Pause at top */
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -180px); /* Fade and float away */
+  }
+}
+      @media (max-width: 768px) {
+        #game-container {
+          height: 500px;
+        }
+
+        #game-header h1 {
+          font-size: 1.5rem;
+        }
+
+        .option {
+          width: 80px;
+          height: 80px;
+          font-size: 0.8rem;
+        }
+      }
+
+      @media (max-width: 480px) {
+        #game-container {
+          height: 400px;
+        }
+
+        #game-header h1 {
+          font-size: 1rem;
+        }
+
+        .option {
+          width: 60px;
+          height: 60px;
+          font-size: 0.6rem;
+        }
+
+        #instructions {
+          font-size: 0.8rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="game-container">
+      <div id="game-header">
+        <h1>Rock Paper Scissors</h1>
+        <div id="score-container">
+          <div id="player-score">You: 0</div>
+          <div id="computer-score">CPU: 0</div>
+        </div>
+      </div>
+      
+      <div id="game-arena">
+        <div id="player"><div id="mouth"></div></div>
+        <div id="options-container">
+  <div class="option" id="rock"><span class="option-emoji">👊</span>ROCK</div>
+  <div class="option" id="paper"><span class="option-emoji">✋</span>PAPER</div>
+  <div class="option" id="scissors"><span class="option-emoji">✌️</span>SCISSORS</div>
+</div>
+        <div id="ground"></div>
+        <div id="instructions">
+          ← → to move, SPACE to jump
+        </div>
+      </div>
+      
+      <div id="battle-screen">
+        <div id="battle-container">
+          <div id="player-choice"></div>
+          <div id="vs">VS</div>
+          <div id="computer-choice"></div>
+        </div>
+        <div id="battle-message"></div>
+        <div id="battle-continue">Press SPACE to continue</div>
+      </div>
+    </div>
+
+    <script>
+      // Game state management
+      class GameState {
+        constructor() {
+          this.states = {
+            LOADING: 'loading',
+            PLAYING: 'playing',
+            BATTLE: 'battle',
+            GAME_OVER: 'gameOver'
+          };
+          
+          this.currentState = this.states.LOADING;
+          this.battleSystem = null;
+          this.player = null;
+          this.keyListener = null;
+        }
+        
+        initialize(battleSystem, player) {
+          this.battleSystem = battleSystem;
+          this.player = player;
+          this.currentState = this.states.PLAYING;
+          
+          // Set up global key listener
+          this.keyListener = this.handleKeyDown.bind(this);
+          document.addEventListener('keydown', this.keyListener);
+        }
+        
+        handleKeyDown(e) {
+          if (this.currentState === this.states.BATTLE) {
+            // Only allow space to continue from battle screen
+            if (e.code === 'Space') {
+              e.preventDefault();
+              this.endBattle();
+            }
+            return;
+          }
+          
+          if (this.currentState === this.states.PLAYING) {
+            this.player.handleKeyDown(e);
+          }
+        }
+        
+        startBattle(playerChoice) {
+          if (this.currentState !== this.states.PLAYING) return;
+          
+          this.currentState = this.states.BATTLE;
+          this.battleSystem.startBattle(playerChoice);
+        }
+        
+        endBattle() {
+          if (this.currentState !== this.states.BATTLE) return;
+          
+          this.battleSystem.endBattle();
+          this.player.reset();
+          this.currentState = this.states.PLAYING;
+        }
+      }
+
+      // Player movement and controls
+      class Player {
+        constructor(element, gameState) {
+          this.element = element;
+          this.gameState = gameState;
+          this.isJumping = false;
+          this.selectedOption = null;
+          this.moveDirection = 0;
+          this.speed = 24; // pixels per frame
+          this.animationFrame = null;
+
+          // Set initial position to center
+          this.element.style.left = '50%';
+
+          // Listen for keyup to stop movement
+          document.addEventListener('keyup', (e) => this.handleKeyUp(e));
+          this.startMoving();
+        }
+
+        handleKeyDown(e) {
+          if (this.gameState.currentState !== 'playing') return;
+
+          if (e.code === 'KeyA' || e.code === 'ArrowLeft') {
+            this.moveDirection = -1;
+          } else if (e.code === 'KeyD' || e.code === 'ArrowRight') {
+            this.moveDirection = 1;
+          }
+
+          if ((e.code === 'Space' || e.code === 'KeyW' || e.code === 'ArrowUp') && !this.isJumping) {
+            e.preventDefault();
+            this.jump();
+          }
+        }
+
+        handleKeyUp(e) {
+          if (
+            e.code === 'KeyA' || e.code === 'ArrowLeft' ||
+            e.code === 'KeyD' || e.code === 'ArrowRight'
+          ) {
+            this.moveDirection = 0;
+          }
+        }
+
+        startMoving() {
+          const move = () => {
+            if (this.moveDirection !== 0 && this.gameState.currentState === 'playing') {
+              this.move(this.moveDirection);
+            }
+            this.animationFrame = requestAnimationFrame(move);
+          };
+          move();
+        }
+
+        move(direction) {
+          const optionsContainer = document.getElementById('options-container');
+          const leftOption = optionsContainer.querySelector('#rock');
+          const rightOption = optionsContainer.querySelector('#scissors');
+          const leftBoundary = leftOption.getBoundingClientRect().left - 10;
+          const rightBoundary = rightOption.getBoundingClientRect().right - this.element.offsetWidth + 10;
+
+          const playerRect = this.element.getBoundingClientRect();
+          let currentLeft = parseFloat(getComputedStyle(this.element).left);
+
+          // Convert percent to px if needed
+          if (typeof currentLeft === 'string' && currentLeft.toString().includes('%')) {
+            // Get parent width
+            const parentWidth = this.element.parentElement.offsetWidth;
+            currentLeft = parentWidth * (parseFloat(currentLeft) / 100);
+          }
+
+          let newLeft = currentLeft + direction * this.speed;
+
+          // Clamp to boundaries
+          const parentRect = this.element.parentElement.getBoundingClientRect();
+          const minLeft = leftBoundary - parentRect.left;
+          const maxLeft = rightBoundary - parentRect.left;
+
+          newLeft = Math.max(minLeft, Math.min(newLeft, maxLeft));
+
+          this.element.style.left = `${newLeft}px`;
+        }
+
+        jump() {
+          if (this.isJumping) return;
+
+          this.isJumping = true;
+          this.element.style.animation = 'jump 0.5s ease-out';
+
+          // At the peak of the jump (50% of 0.5s = 250ms), check for collision and bounce
+          setTimeout(() => {
+            this.checkSelection();
+          }, 250);
+
+          // End jump animation after 0.5s
+          setTimeout(() => {
+            this.element.style.animation = '';
+            this.isJumping = false;
+          }, 500); // match the CSS duration
+        }
+
+        checkSelection() {
+          const playerRect = this.element.getBoundingClientRect();
+          const options = document.querySelectorAll('.option');
+          
+          let selected = null;
+          let minDistance = Infinity;
+          let selectedOptionElement = null;
+          
+          options.forEach(option => {
+            const optionRect = option.getBoundingClientRect();
+            const distance = Math.abs((playerRect.left + playerRect.width / 2) - (optionRect.left + optionRect.width / 2));
+            
+            if (distance < minDistance) {
+              minDistance = distance;
+              selected = option.id;
+              selectedOptionElement = option;
+            }
+          });
+          
+          // Only select if player is close enough
+          if (minDistance < 50 && selectedOptionElement) {
+            // Trigger bounce animation
+            selectedOptionElement.style.animation = 'bounce 0.5s ease';
+            selectedOptionElement.addEventListener('animationend', function handler() {
+              selectedOptionElement.style.animation = '';
+              selectedOptionElement.removeEventListener('animationend', handler);
+            });
+
+            // Trigger emoji popout animation AFTER bounce (500ms delay)
+            const emoji = selectedOptionElement.querySelector('.option-emoji');
+            if (emoji) {
+              setTimeout(() => {
+                emoji.style.animation = 'popout 1s linear';
+                emoji.style.opacity = '1';
+                emoji.addEventListener('animationend', function handler() {
+                  emoji.style.animation = '';
+                  emoji.style.opacity = '0';
+                  emoji.removeEventListener('animationend', handler);
+                });
+              }, 500); // 500ms matches bounce duration
+            }
+
+            this.selectedOption = selected;
+
+            // Delay battle screen until emoji finishes (bounce 0.5s + popout 1s)
+            setTimeout(() => {
+              this.gameState.startBattle(selected);
+            }, 1000);
+          }
+        }
+
+        reset() {
+          // Reset player position
+          this.element.style.left = '50%';  
+          this.selectedOption = null;
+        }
+      }
+
+      // Battle system for Rock Paper Scissors
+      class Battle {
+        constructor(gameState) {
+          this.gameState = gameState;
+          this.battleScreen = document.getElementById('battle-screen');
+          this.playerChoiceEl = document.getElementById('player-choice');
+          this.computerChoiceEl = document.getElementById('computer-choice');
+          this.battleMessageEl = document.getElementById('battle-message');
+          this.battleContinueEl = document.getElementById('battle-continue');
+          
+          this.playerScore = 0;
+          this.computerScore = 0;
+          
+          this.playerScoreEl = document.getElementById('player-score');
+          this.computerScoreEl = document.getElementById('computer-score');
+          
+          this.choices = ['rock', 'paper', 'scissors'];
+          this.emojis = {
+            'rock': '👊',
+            'paper': '✋',
+            'scissors': '✌️'
+          };
+        }
+        
+        startBattle(playerChoice) {
+          setTimeout(() => {
+            this.battleScreen.style.opacity = '1';
+            this.battleScreen.style.pointerEvents = 'auto';
+
+            const computerChoice = this.getRandomChoice();
+            // Set up the animation sequence
+            this.setupBattleAnimation(playerChoice, computerChoice);
+          }, 100); // 250ms delay
+        }
+        
+        setupBattleAnimation(playerChoice, computerChoice) {
+          // Clear previous content
+          this.playerChoiceEl.textContent = '';
+          this.computerChoiceEl.textContent = '';
+          this.battleMessageEl.textContent = '';
+          this.battleContinueEl.style.opacity = '0';
+          
+          // First step: flash the choices
+          this.playerChoiceEl.style.animation = 'flash 0.5s 3';
+          this.computerChoiceEl.style.animation = 'flash 0.5s 3';
+          
+          // After flashing, show the choices
+          setTimeout(() => {
+            this.playerChoiceEl.textContent = this.emojis[playerChoice];
+            this.computerChoiceEl.textContent = this.emojis[computerChoice];
+            
+            this.playerChoiceEl.style.animation = '';
+            this.computerChoiceEl.style.animation = '';
+            
+            // Determine winner
+            const result = this.determineWinner(playerChoice, computerChoice);
+            
+            // Show result with delay
+            setTimeout(() => {
+              if (result === 'win') {
+                this.battleMessageEl.textContent = 'You Win!';
+                this.battleMessageEl.style.color = 'var(--success-color)';
+                this.playerChoiceEl.style.animation = 'pulse 1s 2';
+                this.playerScore++;
+              } else if (result === 'lose') {
+                this.battleMessageEl.textContent = 'You Lose!';
+                this.battleMessageEl.style.color = 'var(--accent-color)';
+                this.computerChoiceEl.style.animation = 'pulse 1s 2';
+                this.computerScore++;
+              } else {
+                this.battleMessageEl.textContent = 'It\'s a Tie!';
+                this.battleMessageEl.style.color = 'var(--warning-color)';
+                this.playerChoiceEl.style.animation = 'shake 0.5s 2';
+                this.computerChoiceEl.style.animation = 'shake 0.5s 2';
+              }
+              
+              // Update scores
+              this.updateScores();
+              
+              // Show continue message
+              this.battleContinueEl.style.opacity = '1';
+            }, 250);
+          }, 450);
+        }
+        
+        getRandomChoice() {
+          const randomIndex = Math.floor(Math.random() * this.choices.length);
+          return this.choices[randomIndex];
+        }
+        
+        determineWinner(playerChoice, computerChoice) {
+          if (playerChoice === computerChoice) {
+            return 'tie';
+          }
+          
+          if (
+            (playerChoice === 'rock' && computerChoice === 'scissors') ||
+            (playerChoice === 'paper' && computerChoice === 'rock') ||
+            (playerChoice === 'scissors' && computerChoice === 'paper')
+          ) {
+            return 'win';
+          }
+          
+          return 'lose';
+        }
+        
+        updateScores() {
+          this.playerScoreEl.textContent = `You: ${this.playerScore}`;
+          this.computerScoreEl.textContent = `CPU: ${this.computerScore}`;
+        }
+        
+        endBattle() {
+          // Hide battle screen
+          this.battleScreen.style.opacity = '0';
+          this.battleScreen.style.pointerEvents = 'none';
+          
+          // Reset battle UI
+          this.battleContinueEl.style.opacity = '0';
+          this.playerChoiceEl.style.animation = '';
+          this.computerChoiceEl.style.animation = '';
+        }
+      }
+
+      // Initialize game
+      document.addEventListener('DOMContentLoaded', function() {
+        // Create game state
+        const gameState = new GameState();
+        
+        // Create battle system
+        const battleSystem = new Battle(gameState);
+        
+        // Create player
+        const playerElement = document.getElementById('player');
+        const player = new Player(playerElement, gameState);
+        
+        // Initialize game state with components
+        gameState.initialize(battleSystem, player);
+        
+        // Set up options visual effects
+        const options = document.querySelectorAll('.option');
+        
+        options.forEach(option => {
+          // Add hover effects
+          option.addEventListener('mouseover', () => {
+            option.style.transform = 'scale(1.05)';
+            option.style.boxShadow = '0 0 10px rgba(63, 81, 181, 0.5)';
+          });
+          
+          option.addEventListener('mouseout', () => {
+            option.style.transform = 'scale(1)';
+            option.style.boxShadow = 'none';
+          });
+        });
+
+        // Add touch controls for mobile devices
+        const gameArena = document.getElementById('game-arena');
+        
+        // Touch area for left side
+        const leftArea = document.createElement('div');
+        leftArea.style.position = 'absolute';
+        leftArea.style.width = '30%';
+        leftArea.style.height = '100%';
+        leftArea.style.left = '0';
+        leftArea.style.top = '0';
+        leftArea.style.zIndex = '5';
+        
+        // Touch area for right side
+        const rightArea = document.createElement('div');
+        rightArea.style.position = 'absolute';
+        rightArea.style.width = '30%';
+        rightArea.style.height = '100%';
+        rightArea.style.right = '0';
+        rightArea.style.top = '0';
+        rightArea.style.zIndex = '5';
+        
+        // Touch area for jump
+        const jumpArea = document.createElement('div');
+        jumpArea.style.position = 'absolute';
+        jumpArea.style.width = '40%';
+        jumpArea.style.height = '100%';
+        jumpArea.style.left = '30%';
+        jumpArea.style.top = '0';
+        jumpArea.style.zIndex = '5';
+        
+        // Add touch events
+        leftArea.addEventListener('touchstart', (e) => {
+          e.preventDefault();
+          if (gameState.currentState === 'playing') {
+            player.moveLeft();
+          }
+        });
+        
+        rightArea.addEventListener('touchstart', (e) => {
+          e.preventDefault();
+          if (gameState.currentState === 'playing') {
+            player.moveRight();
+          }
+        });
+        
+        jumpArea.addEventListener('touchstart', (e) => {
+          e.preventDefault();
+          if (gameState.currentState === 'playing' && !player.isJumping) {
+            player.jump();
+          }
+        });
+        
+        // Add to game arena
+        gameArena.appendChild(leftArea);
+        gameArena.appendChild(rightArea);
+        gameArena.appendChild(jumpArea);
+      });
+    </script>
+  </body>
+</html>
